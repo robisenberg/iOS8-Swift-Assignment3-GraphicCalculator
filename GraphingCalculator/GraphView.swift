@@ -17,9 +17,7 @@ protocol GraphViewDataSource: class {
 class GraphView: UIView {
   
   @IBInspectable
-  var pointsPerUnit: CGFloat = 20.0 {
-    didSet { setNeedsDisplay() }
-  }
+  var pointsPerUnit: CGFloat = 20.0 { didSet { setNeedsDisplay() } }
   
   weak var datasource: GraphViewDataSource? = nil
   
@@ -27,21 +25,16 @@ class GraphView: UIView {
     let axesDrawer = AxesDrawer(contentScaleFactor: contentScaleFactor)
     axesDrawer.drawAxesInRect(bounds, origin: origin, pointsPerUnit: pointsPerUnit)
     
-    println("bounds: \(bounds)")
-    
     if datasource != nil && datasource!.graphViewDataSourceIsReady {
-      let pathOfDrawnFunction = UIBezierPath()
-      for rawX in 0...Int(ceil(bounds.width)) {
-        let newPoint = rawPointForRawXValue(CGFloat(rawX))
-        let x = CGFloat(rawX)
-        if rawX == 0 {
-          pathOfDrawnFunction.moveToPoint(newPoint)
-        }
-        else {
-          pathOfDrawnFunction.addLineToPoint(newPoint)
-        }
+      let chartLinePath = UIBezierPath()
+      for x in 0...Int(ceil(bounds.width)) {
+        let x = CGFloat(x)
+        let newPoint = calculatePointForX(x)
+
+        if x == 0 { chartLinePath.moveToPoint(newPoint) }
+        else { chartLinePath.addLineToPoint(newPoint) }
       }
-      pathOfDrawnFunction.stroke()
+      chartLinePath.stroke()
     }
   }
   
@@ -67,15 +60,16 @@ class GraphView: UIView {
   
   // PRIVATE
   
-  private func rawXToGraphX(x: CGFloat) -> CGFloat { return (x - origin.x) / pointsPerUnit }
-  private func graphYToRawY(y: CGFloat) -> CGFloat { return origin.y - (y * pointsPerUnit) }
+  private func toGraphX(x: CGFloat) -> CGFloat { return (x - origin.x) / pointsPerUnit }
+  private func fromGraphY(y: CGFloat) -> CGFloat { return origin.y - (y * pointsPerUnit) }
   
-  private var origin: CGPoint = CGPointZero
-//  private var localCenter: CGPoint { return convertPoint(center, fromView: superview) }
+  private lazy var origin: CGPoint = {
+    return self.convertPoint(self.center, fromView: self.superview)
+  }()
 
-  private func rawPointForRawXValue(x: CGFloat) -> CGPoint {
-    let graphY = datasource!.yForX(rawXToGraphX(x))!
-    let y = graphYToRawY(graphY)
+  private func calculatePointForX(x: CGFloat) -> CGPoint {
+    let graphY = datasource!.yForX(toGraphX(x))!
+    let y = fromGraphY(graphY)
     return CGPoint(x: x, y: y)
   }
   

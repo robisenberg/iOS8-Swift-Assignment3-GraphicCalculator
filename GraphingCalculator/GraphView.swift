@@ -8,33 +8,50 @@
 
 import UIKit
 
+protocol GraphViewDataSource: class {
+  func yForX(x: CGFloat) -> CGFloat?
+  var graphViewDataSourceIsReady: Bool { get }
+}
+
 @IBDesignable
 class GraphView: UIView {
-
-  @IBInspectable
-  var pointsPerUnit: CGFloat = 20.0
   
-  func yForX(x: CGFloat) -> CGFloat? { return 2 * x } // needs to be supplied by delegate
-
+  @IBInspectable
+  var pointsPerUnit: CGFloat = 20.0 {
+    didSet { setNeedsDisplay() }
+  }
+  
+  weak var datasource: GraphViewDataSource? = nil
   
   override func drawRect(rect: CGRect) {
     let axesDrawer = AxesDrawer(contentScaleFactor: contentScaleFactor)
     axesDrawer.drawAxesInRect(bounds, origin: localCenter, pointsPerUnit: pointsPerUnit)
     
-    let pathOfDrawnFunction = UIBezierPath()
-    for rawX in 0...Int(ceil(bounds.width)) {
-      let newPoint = rawPointForRawXValue(CGFloat(rawX))
-      let x = CGFloat(rawX)
-      if rawX == 0 {
-        pathOfDrawnFunction.moveToPoint(newPoint)
+    println("bounds: \(bounds)")
+    
+    if datasource != nil && datasource!.graphViewDataSourceIsReady {
+      let pathOfDrawnFunction = UIBezierPath()
+      for rawX in 0...Int(ceil(bounds.width)) {
+        let newPoint = rawPointForRawXValue(CGFloat(rawX))
+        let x = CGFloat(rawX)
+        if rawX == 0 {
+          pathOfDrawnFunction.moveToPoint(newPoint)
+        }
+        else {
+          pathOfDrawnFunction.addLineToPoint(newPoint)
+        }
       }
-      else {
-        pathOfDrawnFunction.addLineToPoint(newPoint)
-      }
+      pathOfDrawnFunction.stroke()
     }
-    pathOfDrawnFunction.stroke()
   }
   
+  func scale(gesture: UIPinchGestureRecognizer) {
+    if gesture.state == .Changed {
+      pointsPerUnit *= gesture.scale
+      println("pointsPerUnit: \(pointsPerUnit)")
+      gesture.scale = 1 // reset gesture's scale
+    }
+  }
   
   // PRIVATE
   
@@ -44,7 +61,7 @@ class GraphView: UIView {
   private var localCenter: CGPoint { return convertPoint(center, fromView: superview) }
 
   private func rawPointForRawXValue(x: CGFloat) -> CGPoint {
-    let graphY = yForX(rawXToGraphX(x))!
+    let graphY = datasource!.yForX(rawXToGraphX(x))!
     let y = graphYToRawY(graphY)
     return CGPoint(x: x, y: y)
   }

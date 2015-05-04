@@ -8,8 +8,23 @@
 
 import UIKit
 
-class GraphViewController: UIViewController {
+class GraphViewController: UIViewController, GraphViewDataSource {
 
+  func yForX(x: CGFloat) -> CGFloat? {
+    if let yFunc = yCalculatingFunction { return yFunc(x) }
+
+    return nil
+  }
   
+  var graphViewDataSourceIsReady: Bool { return yCalculatingFunction != nil }
 
+  var yCalculatingFunction: (CGFloat -> CGFloat?)? = nil
+  
+  @IBOutlet weak var graphView: GraphView! {
+    didSet {
+      self.graphView.datasource = self
+      graphView.addGestureRecognizer(UIPinchGestureRecognizer(target: graphView, action: "scale:"))
+
+    }
+  }
 }

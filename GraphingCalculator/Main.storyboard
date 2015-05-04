@@ -387,7 +387,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="pointsPerUnit">
-                                        <real key="value" value="100"/>
+                                        <real key="value" value="20"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </view>
@@ -400,6 +400,9 @@
                             <constraint firstItem="N2M-0V-kz7" firstAttribute="leading" secondItem="Aud-0l-p3r" secondAttribute="leading" id="zzO-3h-eYS"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="graphView" destination="N2M-0V-kz7" id="Ovk-pN-xvj"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gGC-kf-y6Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

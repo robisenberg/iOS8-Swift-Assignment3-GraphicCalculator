@@ -25,7 +25,7 @@ class GraphView: UIView {
   
   override func drawRect(rect: CGRect) {
     let axesDrawer = AxesDrawer(contentScaleFactor: contentScaleFactor)
-    axesDrawer.drawAxesInRect(bounds, origin: localCenter, pointsPerUnit: pointsPerUnit)
+    axesDrawer.drawAxesInRect(bounds, origin: origin, pointsPerUnit: pointsPerUnit)
     
     println("bounds: \(bounds)")
     
@@ -48,17 +48,30 @@ class GraphView: UIView {
   func scale(gesture: UIPinchGestureRecognizer) {
     if gesture.state == .Changed {
       pointsPerUnit *= gesture.scale
-      println("pointsPerUnit: \(pointsPerUnit)")
       gesture.scale = 1 // reset gesture's scale
+    }
+  }
+  
+  func pan(recognizer: UIPanGestureRecognizer) {
+    switch(recognizer.state) {
+    case .Ended: fallthrough
+    case .Changed:
+      let translation = recognizer.translationInView(self)
+      origin.x += translation.x
+      origin.y += translation.y
+      recognizer.setTranslation(CGPointZero, inView: self)
+      setNeedsDisplay()
+    default: break
     }
   }
   
   // PRIVATE
   
-  private func rawXToGraphX(x: CGFloat) -> CGFloat { return (x - localCenter.x) / pointsPerUnit }
-  private func graphYToRawY(y: CGFloat) -> CGFloat { return localCenter.y - (y * pointsPerUnit) }
+  private func rawXToGraphX(x: CGFloat) -> CGFloat { return (x - origin.x) / pointsPerUnit }
+  private func graphYToRawY(y: CGFloat) -> CGFloat { return origin.y - (y * pointsPerUnit) }
   
-  private var localCenter: CGPoint { return convertPoint(center, fromView: superview) }
+  private var origin: CGPoint = CGPointZero
+//  private var localCenter: CGPoint { return convertPoint(center, fromView: superview) }
 
   private func rawPointForRawXValue(x: CGFloat) -> CGPoint {
     let graphY = datasource!.yForX(rawXToGraphX(x))!

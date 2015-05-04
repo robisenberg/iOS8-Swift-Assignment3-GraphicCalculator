@@ -24,7 +24,7 @@ class GraphViewController: UIViewController, GraphViewDataSource {
     didSet {
       self.graphView.datasource = self
       graphView.addGestureRecognizer(UIPinchGestureRecognizer(target: graphView, action: "scale:"))
-
+      graphView.addGestureRecognizer(UIPanGestureRecognizer(target: graphView, action: "pan:"))
     }
   }
 }

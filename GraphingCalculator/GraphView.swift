@@ -58,6 +58,15 @@ class GraphView: UIView {
     }
   }
   
+  func tapped(recognizer: UITapGestureRecognizer) {
+    switch(recognizer.state) {
+    case .Ended:
+      origin = recognizer.locationInView(self)
+      setNeedsDisplay()
+    default: break;
+    }
+  }
+  
   // PRIVATE
   
   private func toGraphX(x: CGFloat) -> CGFloat { return (x - origin.x) / pointsPerUnit }

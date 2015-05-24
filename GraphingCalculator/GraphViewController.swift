@@ -10,15 +10,11 @@ import UIKit
 
 class GraphViewController: UIViewController, GraphViewDataSource {
 
-  func yForX(x: CGFloat) -> CGFloat? {
-    if let yFunc = yCalculatingFunction { return yFunc(x) }
-
-    return nil
+  func yForX(x: CGFloat) -> CGFloat {
+    return CGFloat(yCalculatingFunction(Double(x)))
   }
   
-  var graphViewDataSourceIsReady: Bool { return yCalculatingFunction != nil }
-
-  var yCalculatingFunction: (CGFloat -> CGFloat?)? = nil
+  var yCalculatingFunction: (Double) -> Double = { (x: Double) -> Double in return 0.0 }
   
   @IBOutlet weak var graphView: GraphView! {
     didSet {
@@ -32,4 +28,5 @@ class GraphViewController: UIViewController, GraphViewDataSource {
       graphView.addGestureRecognizer(tapGesture)
     }
   }
+  
 }

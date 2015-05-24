@@ -17,6 +17,7 @@
 		8C4B74E51AF774B400C41420 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B74E41AF774B400C41420 /* GraphView.swift */; };
 		8C4B74E71AF7781300C41420 /* AxesDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B74E61AF7781300C41420 /* AxesDrawer.swift */; };
 		8C4B74E91AF79B9D00C41420 /* GraphViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B74E81AF79B9D00C41420 /* GraphViewController.swift */; };
+		8C4B74EB1AF7EF4100C41420 /* NonCollapsingSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4B74EA1AF7EF4100C41420 /* NonCollapsingSplitViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		8C4B74E41AF774B400C41420 /* GraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 		8C4B74E61AF7781300C41420 /* AxesDrawer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AxesDrawer.swift; sourceTree = "<group>"; };
 		8C4B74E81AF79B9D00C41420 /* GraphViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphViewController.swift; sourceTree = "<group>"; };
+		8C4B74EA1AF7EF4100C41420 /* NonCollapsingSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonCollapsingSplitViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 			children = (
 				8C4A07771AF281A400C1B031 /* CalculatorViewController.swift */,
 				8C4B74E81AF79B9D00C41420 /* GraphViewController.swift */,
+				8C4B74EA1AF7EF4100C41420 /* NonCollapsingSplitViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -253,6 +256,7 @@
 				8C4B74E71AF7781300C41420 /* AxesDrawer.swift in Sources */,
 				8C4B74E91AF79B9D00C41420 /* GraphViewController.swift in Sources */,
 				8C4A07571AF2809100C1B031 /* AppDelegate.swift in Sources */,
+				8C4B74EB1AF7EF4100C41420 /* NonCollapsingSplitViewController.swift in Sources */,
 				8C4B74E51AF774B400C41420 /* GraphView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

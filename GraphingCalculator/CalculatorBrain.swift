@@ -11,6 +11,7 @@ import Foundation
 class CalculatorBrain {
   
   var variableValues = [String: Double]()
+  
   var description: String {
     get {
       let (result, remaining) = description(opStack)
@@ -23,19 +24,48 @@ class CalculatorBrain {
     }
   }
   
+  typealias PropertyList = AnyObject
+  var program: PropertyList {
+    get {
+      return opStack.map { $0.description }
+    }
+    set {
+      if let opSymbols = newValue as? [String] {
+        var newOpStack = [Op]()
+        for opSymbol in opSymbols {
+          if let op = knownOps[opSymbol] {
+            newOpStack.append(op)
+          } else if let operand = NSNumberFormatter().numberFromString(opSymbol)?.doubleValue {
+            newOpStack.append(.Operand(operand))
+          } else {
+            let variableSymbol = opSymbol
+            newOpStack.append(.Variable(variableSymbol))
+          }
+        }
+        
+        opStack = newOpStack
+      }
+    }
+  }
+  
+  
+  
   private enum Op: Printable {
-    case Constant(String)
+    case Variable(String)
     case Operand(Double)
+    case Constant(String, Double)
     case UnaryOperation(String, Double -> Double)
     case BinaryOperation(String, (Double, Double) -> Double)
     
     var description: String {
       get {
         switch self {
-          case .Constant(let name):
-            return name
+          case .Variable(let symbol):
+            return symbol
           case .Operand(let value):
             return "\(value)"
+          case .Constant(let name, _):
+            return name
           case .UnaryOperation(let symbol, _):
             return symbol
           case .BinaryOperation(let symbol, _):
@@ -44,8 +74,6 @@ class CalculatorBrain {
       }
     }
   }
-  private var opStack = [Op]()
-  private var knownOps = [String:Op]()
   
   init() {
     func learnOp(op: Op) { knownOps[op.description] = op }
@@ -57,11 +85,17 @@ class CalculatorBrain {
     learnOp(Op.UnaryOperation("√", sqrt))
     learnOp(Op.UnaryOperation("sin", sin))
     learnOp(Op.UnaryOperation("cos", cos))
+    learnOp(Op.Constant("π", M_PI))
   }
   
   
-  func pushOperand(name: String) -> Double? {
-    opStack.append(Op.Constant(name))
+  func pushConstant(constantName: String) -> Double? {
+    if let constant = knownOps[constantName] { opStack.append(constant) }
+    return evaluate()
+  }
+  
+  func pushOperand(symbol: String) -> Double? {
+    opStack.append(Op.Variable(symbol))
     return evaluate()
   }
   
@@ -79,7 +113,6 @@ class CalculatorBrain {
 
   func evaluate() -> Double? {
     let (result, remainder) = evaluate(opStack)
-    println("\(opStack) = \(result) with \(remainder)")
     return result
   }
   
@@ -87,16 +120,21 @@ class CalculatorBrain {
     opStack.removeAll()
   }
   
+  private var opStack = [Op]()
+  private var knownOps = [String:Op]()
+  
   private func description(operands: [Op]) -> (result: String?, remainingOperands: [Op]) {
     if !operands.isEmpty {
       var remainingOperands = operands
       let firstOperand = remainingOperands.removeLast()
       
       switch(firstOperand) {
-      case .Constant(let name):
+      case .Constant(let name, _):
         return (name, remainingOperands)
       case .Operand(let value):
         return ("\(value)", remainingOperands)
+      case .Variable(let symbol):
+        return (symbol, remainingOperands)
       case .UnaryOperation(let op, _):
         let (operand, operandRemainingOperands) = description(remainingOperands)
         if let operandDescription = operand {
@@ -122,12 +160,14 @@ class CalculatorBrain {
       let firstOperand = remainingOperands.removeLast()
 
       switch(firstOperand) {
-        case .Constant(let name):
-          if let value = variableValues[name] {
-            return (value, remainingOperands)
-          }
+        case .Constant(_, let value):
+          return (value, remainingOperands)
         case .Operand(let value):
           return (value, remainingOperands)
+        case .Variable(let symbol):
+          if let value = variableValues[symbol] {
+            return (value, remainingOperands)
+          }
         case .UnaryOperation(_, let operation):
           let operandEvaluation = evaluate(remainingOperands)
           if let operand = operandEvaluation.result {

@@ -9,8 +9,7 @@
 import UIKit
 
 protocol GraphViewDataSource: class {
-  func yForX(x: CGFloat) -> CGFloat?
-  var graphViewDataSourceIsReady: Bool { get }
+  func yForX(x: CGFloat) -> CGFloat
 }
 
 @IBDesignable
@@ -25,7 +24,7 @@ class GraphView: UIView {
     let axesDrawer = AxesDrawer(contentScaleFactor: contentScaleFactor)
     axesDrawer.drawAxesInRect(bounds, origin: origin, pointsPerUnit: pointsPerUnit)
     
-    if datasource != nil && datasource!.graphViewDataSourceIsReady {
+    if datasource != nil {
       let chartLinePath = UIBezierPath()
       for x in 0...Int(ceil(bounds.width)) {
         let x = CGFloat(x)
@@ -77,7 +76,7 @@ class GraphView: UIView {
   }()
 
   private func calculatePointForX(x: CGFloat) -> CGPoint {
-    let graphY = datasource!.yForX(toGraphX(x))!
+    let graphY = datasource!.yForX(toGraphX(x))
     let y = fromGraphY(graphY)
     return CGPoint(x: x, y: y)
   }

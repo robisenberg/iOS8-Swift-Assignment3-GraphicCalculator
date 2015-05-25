@@ -158,7 +158,6 @@ class CalculatorBrain {
       case .Operand(let value):
         return ("\(value)", remainingOperands)
       case .Variable(let symbol):
-        println("describing .Variable: \(symbol)")
         return (symbol, remainingOperands)
       case .UnaryOperation(let op, _):
         let (operand, operandRemainingOperands) = description(remainingOperands)

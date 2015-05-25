@@ -54,17 +54,13 @@ class CalculatorViewController: UIViewController {
   
   @IBAction func setMemoryValue(sender: UIButton) {
     if let value = displayValue { brain.variableValues["M"] = value }
-    println("brain.variableValues M: \(brain.variableValues)")
     displayValue = brain.evaluate()
   }
   
   @IBAction func enterMemoryValue(sender: UIButton) {
     if userIsInTheMiddleOfEnteringDigits { enter() }
     else { displayValue = nil }
-    println("here: a")
     if let value = brain.pushOperand("M") {
-      println("here: b")
-
       displayValue = value
     }
   }

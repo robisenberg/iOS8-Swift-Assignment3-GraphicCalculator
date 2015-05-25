@@ -26,23 +26,27 @@ class GraphView: UIView {
     
     if datasource != nil {
       let chartLinePath = UIBezierPath()
+      var previousPointWasUndrawable = true
       
       for viewCoordX in 0...Int(ceil(bounds.width)) {
         let viewCoordX = CGFloat(viewCoordX)
         let x = toGraphX(viewCoordX)
         let y = datasource!.yForX(Double(x))
 
-        
         if y == nil || (!y!.isNormal && !y!.isZero) {
-          let viewCoordY = CGFloat(0.0)
-          chartLinePath.moveToPoint(CGPoint(x: viewCoordX, y: viewCoordY))
+          previousPointWasUndrawable = true
+          continue
+        }
+        
+        let viewCoordY = fromGraphY(CGFloat(y!))
+        let point = CGPoint(x: viewCoordX, y: viewCoordY)
+
+        if previousPointWasUndrawable {
+          chartLinePath.moveToPoint(point)
+          previousPointWasUndrawable = false
         }
         else {
-          let viewCoordY = fromGraphY(CGFloat(y!))
-          let point = CGPoint(x: viewCoordX, y: viewCoordY)
-
-          if viewCoordX == 0 { chartLinePath.moveToPoint(point) }
-          else { chartLinePath.addLineToPoint(point) }
+          chartLinePath.addLineToPoint(point)
         }
       }
       chartLinePath.stroke()

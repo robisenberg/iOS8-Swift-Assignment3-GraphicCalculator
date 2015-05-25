@@ -14,11 +14,10 @@ class CalculatorViewController: UIViewController {
   var brain = CalculatorBrain()
   
   var displayValue: Double? {
-    get { return NSString(string: display.text!).doubleValue }
+    get { return NSNumberFormatter().numberFromString(display.text!)?.doubleValue }
     set {
-      if let value = newValue { display.text = "\(value)" }
-      else { display.text = "0" }
       userIsInTheMiddleOfEnteringDigits = false
+      display.text = newValue?.description ?? " "
       descriptionText.text = "\(brain.description) ="
     }
   }
@@ -55,12 +54,19 @@ class CalculatorViewController: UIViewController {
   
   @IBAction func setMemoryValue(sender: UIButton) {
     if let value = displayValue { brain.variableValues["M"] = value }
+    println("brain.variableValues M: \(brain.variableValues)")
     displayValue = brain.evaluate()
   }
   
   @IBAction func enterMemoryValue(sender: UIButton) {
-    userIsInTheMiddleOfEnteringDigits = false
-    if let value = displayValue { displayValue = brain.pushOperand("M") }
+    if userIsInTheMiddleOfEnteringDigits { enter() }
+    else { displayValue = nil }
+    println("here: a")
+    if let value = brain.pushOperand("M") {
+      println("here: b")
+
+      displayValue = value
+    }
   }
   
   @IBAction func operatorPressed(sender: UIButton) {
@@ -71,7 +77,7 @@ class CalculatorViewController: UIViewController {
 
   @IBAction func reset() {
     userIsInTheMiddleOfEnteringDigits = false
-    brain.clear()
+    brain.clearAll()
     displayValue = nil
   }
   
@@ -85,14 +91,9 @@ class CalculatorViewController: UIViewController {
       let currentCalculatorWithSavedState = CalculatorBrain()
       currentCalculatorWithSavedState.program = brain.program
             
-      graphViewController.yCalculatingFunction = { (x: Double) -> Double in
+      graphViewController.yForXFunction = { (x: Double) -> Double? in
         currentCalculatorWithSavedState.variableValues["M"] = x
-        if let result = currentCalculatorWithSavedState.evaluate() {
-          return result
-        }
-        else {
-          return 0.0
-        }
+        return currentCalculatorWithSavedState.evaluate()
       }
     }
   }

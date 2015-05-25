@@ -9,12 +9,12 @@
 import UIKit
 
 class GraphViewController: UIViewController, GraphViewDataSource {
-
-  func yForX(x: CGFloat) -> CGFloat {
-    return CGFloat(yCalculatingFunction(Double(x)))
-  }
   
-  var yCalculatingFunction: (Double) -> Double = { (x: Double) -> Double in return 0.0 }
+  var yForXFunction: (Double) -> Double? = { (x: Double) -> Double? in return nil }
+  
+  func yForX(x: Double) -> Double? {
+    return yForXFunction(x)
+  }
   
   @IBOutlet weak var graphView: GraphView! {
     didSet {

@@ -9,7 +9,7 @@
 import UIKit
 
 protocol GraphViewDataSource: class {
-  func yForX(x: CGFloat) -> CGFloat
+  func yForX(x: Double) -> Double?
 }
 
 @IBDesignable
@@ -26,12 +26,24 @@ class GraphView: UIView {
     
     if datasource != nil {
       let chartLinePath = UIBezierPath()
-      for x in 0...Int(ceil(bounds.width)) {
-        let x = CGFloat(x)
-        let newPoint = calculatePointForX(x)
+      
+      for viewCoordX in 0...Int(ceil(bounds.width)) {
+        let viewCoordX = CGFloat(viewCoordX)
+        let x = toGraphX(viewCoordX)
+        let y = datasource!.yForX(Double(x))
 
-        if x == 0 { chartLinePath.moveToPoint(newPoint) }
-        else { chartLinePath.addLineToPoint(newPoint) }
+        
+        if y == nil || (!y!.isNormal && !y!.isZero) {
+          let viewCoordY = CGFloat(0.0)
+          chartLinePath.moveToPoint(CGPoint(x: viewCoordX, y: viewCoordY))
+        }
+        else {
+          let viewCoordY = fromGraphY(CGFloat(y!))
+          let point = CGPoint(x: viewCoordX, y: viewCoordY)
+
+          if viewCoordX == 0 { chartLinePath.moveToPoint(point) }
+          else { chartLinePath.addLineToPoint(point) }
+        }
       }
       chartLinePath.stroke()
     }
@@ -41,6 +53,7 @@ class GraphView: UIView {
     if gesture.state == .Changed {
       pointsPerUnit *= gesture.scale
       gesture.scale = 1 // reset gesture's scale
+      setNeedsDisplay()
     }
   }
   
@@ -70,15 +83,7 @@ class GraphView: UIView {
   
   private func toGraphX(x: CGFloat) -> CGFloat { return (x - origin.x) / pointsPerUnit }
   private func fromGraphY(y: CGFloat) -> CGFloat { return origin.y - (y * pointsPerUnit) }
-  
   private lazy var origin: CGPoint = {
     return self.convertPoint(self.center, fromView: self.superview)
   }()
-
-  private func calculatePointForX(x: CGFloat) -> CGPoint {
-    let graphY = datasource!.yForX(toGraphX(x))
-    let y = fromGraphY(graphY)
-    return CGPoint(x: x, y: y)
-  }
-  
 }

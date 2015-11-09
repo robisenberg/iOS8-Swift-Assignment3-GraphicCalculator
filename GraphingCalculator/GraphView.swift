@@ -53,6 +53,8 @@ class GraphView: UIView {
     }
   }
   
+  // MARK: - Gestures
+  
   func scale(gesture: UIPinchGestureRecognizer) {
     if gesture.state == .Changed {
       pointsPerUnit *= gesture.scale
@@ -83,7 +85,7 @@ class GraphView: UIView {
     }
   }
   
-  // PRIVATE
+  // MARK: - Private Implementation
   
   private func toGraphX(x: CGFloat) -> CGFloat { return (x - origin.x) / pointsPerUnit }
   private func fromGraphY(y: CGFloat) -> CGFloat { return origin.y - (y * pointsPerUnit) }

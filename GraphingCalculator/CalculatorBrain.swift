@@ -65,7 +65,7 @@ class CalculatorBrain {
 //    case Low
 //  }
   
-  private enum Op: Printable {
+  private enum Op: CustomStringConvertible {
     case Variable(String)
     case Operand(Double)
     case Constant(String, Double)
@@ -127,7 +127,7 @@ class CalculatorBrain {
   }
 
   func evaluate() -> Double? {
-    let (result, remainder) = evaluate(opStack)
+    let (result, _) = evaluate(opStack)
     return result
   }
   
